@@ -1,107 +1,102 @@
 // SumEvenIntegers.asm
-// 计算前n个偶数的和: 0 + 2 + 4 + ... + 2*(n-1)
+// 计算前n个偶数的和: z = ∑(i=0到n)2*i = n*(n+1)
 // 输入: R0 = n
-// 输出: R1 = 结果
-// 约束: 不得修改 R0 的初始值
-// 如果 n < 0, R1 = -1
-// 如果溢出, R1 = -2
+// 输出: R1 = 结果 (n<0→-1, 溢出→-2, 正常→n*(n+1))
+// 约束: 不修改R0初始值 | 16位2补码溢出检查
+// 复用Sum_to_n.asm的累加结构 + Multiply.asm的乘法逻辑 + 第5题的溢出检查
 
-// 检查 n 是否为负数
+// 第一步：判断n是否为负数，负数直接置R1=-1
 @R0
 D=M
-@CHECK_NEGATIVE
-D;JLT
+@NEGATIVE_CASE
+D;JLT           // n<0 → 跳转到负数分支
 
-// 检查 n 是否为 0
+// 第二步：初始化乘法参数（复用Multiply.asm的ACCUMULATOR/COUNTER命名）
 @R0
 D=M
-@CHECK_ZERO
-D;JEQ
-
-// n > 0 的情况，开始计算
+@COUNTER        // 乘法循环计数器 = n
+M=D
 @R0
 D=M
-@COUNTER
-M=D             // COUNTER = n (剩余要加的项数)
-@R1
-M=0             // R1 = 0 (结果累加器)
-@CURRENT_EVEN
-M=0             // CURRENT_EVEN = 0 (当前要加的偶数)
+D=D+1
+@MULTIPLIER     // 被乘数 = n+1
+M=D
+@ACCUMULATOR    // 累加器（存储乘法结果）初始化为0
+M=0
 
-(CALC_LOOP)
+// 第三步：乘法循环（复用Multiply.asm的循环逻辑）
+(MULTIPLY_LOOP)
+// 检查终止条件：COUNTER <= 0 则结束循环
 @COUNTER
 D=M
-@CALC_DONE
-D;JLE           // 当计数器 <= 0 时结束
+@END_MULTIPLY
+D;JLE
 
-// 计算 R1 + CURRENT_EVEN 的结果，检查溢出
+// 溢出检查（复刻第5题AddWithOverflowCheck核心逻辑）
+@ACCUMULATOR
+D=M
+@SIGN_ACC       // 暂存累加器符号
+M=D
+@MULTIPLIER
+D=M
+@SIGN_MUL       // 暂存被乘数符号
+M=D
+
+// 执行累加：ACCUMULATOR += MULTIPLIER
+@MULTIPLIER
+D=M
+@ACCUMULATOR
+M=D+M
+
+// 判定溢出：同号相加结果异号则溢出
+@SIGN_ACC
+D=M
+@SIGN_MUL
+D=D&M
+@SAME_SIGN
+D;JLT           // 都为负→同号，无溢出
+@SIGN_ACC
+D=M
+@OVERFLOW_CASE
+D;JLT           // 累加器负、被乘数正→异号，无溢出
+@SIGN_MUL
+D=M
+@OVERFLOW_CASE
+D;JLT           // 累加器正、被乘数负→异号，无溢出
+@SAME_SIGN
+0;JMP           // 都为正→同号，无溢出
+
+// 溢出分支：置R1=-2并结束
+(OVERFLOW_CASE)
 @R1
-D=M
-@TEMP_SUM
-M=D             // 临时保存当前和
+M=-2
+@END
+0;JMP
 
-@CURRENT_EVEN
-D=M
-@TEMP_SUM
-D=D+M           // 计算 R1 + CURRENT_EVEN
+// 无溢出：计数器减1，继续循环
+(SAME_SIGN)
+@COUNTER
+M=M-1
+@MULTIPLY_LOOP
+0;JMP
 
-// 溢出检查：当两个非负数相加结果为负数时发生溢出
-// 由于我们从0开始加正偶数，R1和CURRENT_EVEN都应该是非负的
-@R1
-D=M
-@CHECK_POS_ADD
-D;JLT           // 如果R1已经是负数（可能由于溢出），则跳过检查
-
-@CURRENT_EVEN
-D=M
-@CHECK_POS_ADD
-D;JLT           // 如果CURRENT_EVEN是负数（不应该），也跳过检查
-
-// 两个操作数都非负，检查结果是否为负（溢出）
-@TEMP_SUM
-D=M
-@OVERFLOW_OCCURRED
-D;JLT           // 如果结果 < 0，发生溢出
-
-(CHECK_POS_ADD)
-// 没有溢出，将结果存回R1
-@TEMP_SUM
+// 乘法完成：将累加器结果存入R1
+(END_MULTIPLY)
+@ACCUMULATOR
 D=M
 @R1
 M=D
-
-// 更新下一个偶数 (CURRENT_EVEN += 2)
-@CURRENT_EVEN
-M=M+1
-@CURRENT_EVEN
-M=M+1
-
-// 计数器减1
-@COUNTER
-M=M-1
-@CALC_LOOP
-0;JMP
-
-(CALC_DONE)
 @END
 0;JMP
 
-(CHECK_NEGATIVE)
+// 负数分支：n<0 → R1=-1
+(NEGATIVE_CASE)
 @R1
-M=-1            // n < 0, 设置 R1 = -1
+M=-1
 @END
 0;JMP
 
-(CHECK_ZERO)
-@R1
-M=0             // n = 0, 设置 R1 = 0 (空和为0)
-@END
-0;JMP
-
-(OVERFLOW_OCCURRED)
-@R1
-M=-2            // 溢出，设置 R1 = -2
-
+// 程序结束（复用Sum_to_n.asm/Find_array_max系列的死循环结束方式）
 (END)
 @END
 0;JMP
