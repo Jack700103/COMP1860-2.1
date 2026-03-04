@@ -5,51 +5,44 @@ D;JEQ
 
 @R0
 D=M
-@TEMP_X
-M=D             
-
-@R0
-D=M
 @IS_POSITIVE
 D;JGE
 
 @R0
 D=M
-@TEMP_ABS
-M=!D           
-@TEMP_ABS
-D=D+1          
-@ABS_VALUE
-M=D
-@START_MULTIPLICATION
+@R14           
+M=!D            
+@R14
+M=M+1          
+@ABS_X
 0;JMP
 
 (IS_POSITIVE)
 @R0
 D=M
-@ABS_VALUE
+@R14            
 M=D
 
-(START_MULTIPLICATION)
-@ABS_VALUE
+(ABS_X)
+@R14
 D=M
-@COUNTER
-M=D             
-@R1
-M=0             
+@R3             
+M=D
+@R1           
+M=0
 
 (MULTIPLY_LOOP)
-@COUNTER
+@R3
 D=M
 @CALCULATION_DONE
 D;JLE           
 
-@ABS_VALUE
+@R14
 D=M
 @R1
 M=D+M           
 
-@COUNTER
+@R3
 M=M-1
 @MULTIPLY_LOOP
 0;JMP
@@ -60,7 +53,7 @@ M=M-1
 
 (CHECK_ZERO)
 @R1
-M=0           
+M=0             
 
 (END)
 @END
