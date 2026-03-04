@@ -1,40 +1,40 @@
 @R0
 D=M
-@NEG_CASE
+@NEGATIVE_CASE
 D;JLT           
 
 @R0
 D=M
 @R3
-M=D+1           
+M=D+1         
 @R0
 D=M
 @R4
-M=D            
+M=D             
 @R1
 M=0             
-@MULT_LOOP
-0;JMP           
+@MULTIPLY_LOOP
+0;JMP          
 
-(MULT_LOOP)
+(MULTIPLY_LOOP)
 @R4
 D=M
 @END_CALC
-D;JEQ          
+D;JEQ           
 
 @R1
 D=M
 @R5
-M=D            
+M=D             
 @R3
 D=M
 @R6
-M=D            
+M=D           
 
 @R3
 D=M
 @R1
-M=D+M          
+M=D+M           
 
 @R5
 D=M
@@ -44,16 +44,16 @@ D=D&M
 D;JLT           
 @R5
 D=M
-@OVERFLOW
-D;JLT         
+@OVERFLOW_CASE
+D;JLT           
 @R6
 D=M
-@OVERFLOW
+@OVERFLOW_CASE
 D;JLT           
 @SAME_SIGN
-0;JMP         
+0;JMP          
 
-(OVERFLOW)
+(OVERFLOW_CASE)
 @R1
 M=-2
 @END
@@ -62,10 +62,10 @@ M=-2
 (SAME_SIGN)
 @R4
 M=M-1
-@MULT_LOOP
+@MULTIPLY_LOOP
 0;JMP
 
-(NEG_CASE)
+(NEGATIVE_CASE)
 @R1
 M=-1
 @END
