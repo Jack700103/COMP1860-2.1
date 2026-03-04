@@ -6,55 +6,73 @@ D;JLT
 @R0
 D=M
 @R3
-M=D+1         
+M=D+1          
+
+@R0
+D=M
+@OVERFLOW_CASE
+D;JEQ       
 
 @R1
-M=0
+M=0           
 @R0
 D=M
 @R4
-M=D            
+M=D      
 @MULTIPLY_LOOP
-0;JMP         
+0;JMP          
 
 (MULTIPLY_LOOP)
 @R4
 D=M
-@OVERFLOW_CHECK_FINAL
-D;JLE          
+@END_CALC
+D;JLE        
+
+@R1
+D=M
+@R6
+M=D           
+@R3
+D=M
+@R7
+M=D           
 
 @R3
 D=M
-@SIGN_A
-M=D           
 @R1
-D=M
-@SIGN_RES
-M=D           
+M=D+M         
 
-@R3
+@R6
 D=M
-@R1
-M=D+M          
+@R7
+D=D&M
+@SAME_SIGN
+D;JLT         
 
-@SIGN_A
+@R6
 D=M
-@SIGN_RES
-D=D&M         
-@SIGN_SAME
-D;JLT          
-@OVERFLOW_CASE 
+@DIFF_SIGN1
+D;JLT
+@R7
+D=M
+@DIFF_SIGN1
+D;JLT
+@SAME_SIGN
+0;JMP          
+
+(DIFF_SIGN1)
+@OVERFLOW_CASE
 0;JMP
 
-(SIGN_SAME)
+(SAME_SIGN)
 @R4
-M=M-1          
+M=M-1        
 @MULTIPLY_LOOP
-0;JMP         
+0;JMP
 
 (NEGATIVE_CASE)
 @R1
-M=-1          
+M=-1           
 @END
 0;JMP
 
@@ -64,7 +82,7 @@ M=-2
 @END
 0;JMP
 
-(OVERFLOW_CHECK_FINAL)
+(END_CALC)
 @R1
 D=M
 @END
