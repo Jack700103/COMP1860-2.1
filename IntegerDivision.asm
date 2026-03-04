@@ -1,154 +1,109 @@
-@R1
-D=M
-@SET_INVALID
-D;JEQ  
+    @R1
+    D=M
+    @INVALID
+    D;JEQ
 
-@R0
-D=M
-@32768
-D=A-D  
-@R1
-D=M
-@0xFFFF
-D=D-A  
-@SET_INVALID
-D;JEQ
+    @R4
+    M=0
 
-@R0
-D=M
-@SIGN_X
-M=0    
-@32767
-D=D-A  
-@SIGN_X
-M=-1   
+    @R0
+    D=M
+    @R5
+    M=D
+    @CHECK_X_SIGN
+    D;JGE
+    @R5
+    M=-M
+    (CHECK_X_SIGN)
 
-@R1
-D=M
-@SIGN_Y
-M=0    
-@32767
-D=D-A  
-@SIGN_Y
-M=-1   
+    @R1
+    D=M
+    @R6
+    M=D
+    @CHECK_Y_SIGN
+    D;JGE
+    @R6
+    M=-M
+    (CHECK_Y_SIGN)
 
-@R0
-D=M
-@X_ABS
-M=D
-@SIGN_X
-D=M
-@ADJUST_X
-D;JEQ 
-@X_ABS
-D=M
-@X_ABS
-M=-D   
-(ADJUST_X)
+    @R2
+    M=0
 
-@R1
-D=M
-@Y_ABS
-M=D
-@SIGN_Y
-D=M
-@ADJUST_Y
-D;JEQ  
-@Y_ABS
-D=M
-@Y_ABS
-M=-D  
-(ADJUST_Y)
+    (DIV_LOOP)
+    @R5
+    D=M
+    @R6
+    D=D-M
+    @APPLY_SIGNS
+    D;LT
 
-@X_ABS
-D=M
-@CURRENT
-M=D
-@Y_ABS
-D=M
-@DIVISOR
-M=D
-@QUOTIENT
-M=0
+    @R5
+    M=D
 
-(DIV_LOOP)
-@CURRENT
-D=M
-@DIVISOR
-D=D-M  
-@CONTINUE
-D;JGE  
-@END_DIV
-0;JMP
+    @R2
+    M=M+1
 
-(CONTINUE)
-@QUOTIENT
-M=M+1  
-@CURRENT
-M=M-M  
-@DIV_LOOP
-0;JMP
+    @DIV_LOOP
+    0;JMP
 
-(END_DIV)
-@QUOTIENT
-D=M
-@M_ABS
-M=D    
-@CURRENT
-D=M
-@Q_ABS
-M=D    
+    (APPLY_SIGNS)
+    @R0
+    D=M
+    @REM_POSITIVE
+    D;JGE
 
-@SIGN_X
-D=M
-@SIGN_Y
-D=D-M  
-@SIGN_M
-M=D
-@M_ABS
-D=M
-@SIGN_M
-D=D*M  
-@R2
-M=D
+    @R5
+    D=-M
+    @STORE_REM
+    0;JMP
 
-@SIGN_X
-D=M
-@Q_ABS
-D=D*M  
-@R3
-M=D
+    (REM_POSITIVE)
+    @R5
+    D=M
 
-@Q_ABS
-D=M
-@Y_ABS
-D=D-M  
-@VALID
-D;JLT 
+    (STORE_REM)
+    @R3
+    M=D
 
-@R2
-D=M
-@SIGN_M
-D=D-M 
-@R2
-M=D
-@Q_ABS
-D=M
-@Y_ABS
-D=D-M  
-@R3
-M=D
+    @R0
+    D=M
+    @X_POS
+    D;JGE
+    @X_NEG
+    0;JMP
 
-(VALID)
-@R4
-M=0    
-@END
-0;JMP
+    (X_POS)
+    @R1
+    D=M
+    @FINISH
+    D;JLT
+    @FINISH
+    0;JMP
 
-(SET_INVALID)
-@R4
-M=1    
+    (X_NEG)
+    @R1
+    D=M
+    @NEGATE_QUOTIENT
+    D;JGE
+    @FINISH
+    0;JMP
 
-(END)
-@END
-0;JMP
+    (NEGATE_QUOTIENT)
+    @R2
+    M=-M
+
+    (FINISH)
+    @END
+    0;JMP
+
+    (INVALID)
+    @R4
+    M=1
+    @R2
+    M=0
+    @R3
+    M=0
+
+    (END)
+    @END
+    0;JMP
