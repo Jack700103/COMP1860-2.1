@@ -3,53 +3,95 @@ D=M
 @R1
 D=D+M
 @R2
-M=D
+M=D             
 
 @R0
 D=M
-@CHECK_Y_SIGN
-D;JLT
+@SIGN_CHECK
+M=D             
 
 @R1
 D=M
-@CHECK_BOTH_POS
-D;JLT
-@END_NO_OVERFLOW
-0;JMP
+@SIGN_Y
+M=D            
 
-(CHECK_BOTH_POS)
+@SIGN_CHECK
+D=M
+@SIGN_Y
+D=D&M           
+@CHECK_SIGN_BIT
+M=D             
+
+@SIGN_CHECK
+D=M
+@SIGN_Y
+D=D|M         
+@CHECK_POS_OR_NEG
+M=D         
+
+@CHECK_SIGN_BIT
+D=M
+@TEST_HIGH_BIT
+M=D            
+
+@TEST_HIGH_BIT
+D=M
+@MASK_HIGH_BIT
+M=D            
+
+@SIGN_CHECK
+D=M
+@SIGN_Y
+D=D&M
+@HIGH_BIT_MASK
+M=D
+
+@SIGN_CHECK
+D=M
+@IS_X_NEG
+D;JGE           
+
+@SIGN_Y
+D=M
+@IS_Y_NEG
+D;JGE           
 
 @R2
 D=M
 @SET_OVERFLOW
-D;JLT
-@END_NO_OVERFLOW
+D;JGE           
+@NO_OVERFLOW
 0;JMP
 
-(CHECK_Y_SIGN)
+(IS_X_NEG)
 
-@R1
+@SIGN_Y
 D=M
-@CHECK_BOTH_NEG
-D;JGE
-@END_NO_OVERFLOW
-0;JMP
-(CHECK_BOTH_NEG)
+@IS_Y_POS
+D;JLT           
 
 @R2
 D=M
 @SET_OVERFLOW
-D;JGE
+D;JLT           
+@NO_OVERFLOW
+0;JMP
+
+(IS_Y_NEG)
+(IS_Y_POS)
+
+@NO_OVERFLOW
+0;JMP
 
 (SET_OVERFLOW)
 @R3
-M=1
+M=1             
 @END
 0;JMP
 
-(END_NO_OVERFLOW)
+(NO_OVERFLOW)
 @R3
-M=0
+M=0             
 
 (END)
 @END
