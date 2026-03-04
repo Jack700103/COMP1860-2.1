@@ -1,51 +1,51 @@
 @R0
 D=M
 @R1
-D=D+M          
+D=D+M
 @R2
-M=D            
+M=D
+
 
 @R0
 D=M
 @R1
-D=D&M          
+D=D^M
 
 @R0
 D=M
-@CHECK_POS
-D;JGE          
+@CHECK_X_POS
+D;JGE
+
 
 @R1
 D=M
-@CHECK_BOTH_NEG
-D;JLT          
+@CHECK_Y_NEG
+D;JLT
 @NO_OVERFLOW
-0;JMP         
 
-(CHECK_BOTH_NEG)
+(CHECK_Y_NEG)
 
 @R2
 D=M
-@NO_OVERFLOW
-D;JGE          
 @OVERFLOW
+D;JGE
+@NO_OVERFLOW
 0;JMP
 
-(CHECK_POS)
+(CHECK_X_POS)
 
 @R1
 D=M
-@CHECK_BOTH_POS
-D;JGE         
+@CHECK_Y_POS
+D;JGE
 @NO_OVERFLOW
-0;JMP         
 
-(CHECK_BOTH_POS)
+(CHECK_Y_POS)
 
-@R2
+
 D=M
 @OVERFLOW
-D;JLT          
+D;JLT
 
 (NO_OVERFLOW)
 @R3
