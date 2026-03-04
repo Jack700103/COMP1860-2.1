@@ -1,116 +1,70 @@
-@R0
-D=M
-@CHECK_NEGATIVE
-D;JLT
+    @R0
+    D=M
+    @NEGATIVE
+    D;JLT
 
-@R0
-D=M
-@CHECK_ZERO
-D;JEQ
+    @R1
+    M=0        
+    @i
+    M=0        
 
-@R0
-D=M
-@COUNTER
-M=D          
-@R1
-M=0             
-@CURRENT_EVEN
-M=0             
+(LOOP)
+    @i
+    D=M
+    @R0
+    D=D-M     
+    @END
+    D;JGT
 
-(CALC_LOOP)
-@COUNTER
-D=M
-@CALC_DONE
-D;JLE           
+    @i
+    D=M
+    @2
+    D=D+A     
+    @R1
+    M=D+M      
 
-@R1
-D=M
-@TEMP_RESULT
-M=D            
+    @R1
+    D=M
+    @PREV
+    M=D        
+    @i
+    D=M
+    @2
+    D=D+A
+    @R1
+    M=M-D      
+    @PREV
+    D=M
+    @R1
+    M=D       
+    @R1
+    D=M
+    @PREVSUM
+    M=D        
+    @R1
+    D=M
+    @PREVSUM
+    D=D-M      
+    @OVERFLOW
+    D;JLT
 
-@CURRENT_EVEN
-D=M
-@TEMP_RESULT
-D=D+M          
+    @i
+    M=M+1
+    @LOOP
+    0;JMP
 
-@R1
-D=M
-@CHECK_FIRST_OPERAND
-D;JLT
+(NEGATIVE)
+    @R1
+    M=-1
+    @END
+    0;JMP
 
-@CURRENT_EVEN
-D=M
-@CHECK_SECOND_OPERAND
-D;JLT
-
-@TEMP_RESULT
-D=M
-@ADD_CURRENT_VALUE
-D;JGE
-@OVERFLOW_OCCURRED
-0;JMP
-
-(CHECK_FIRST_OPERAND)
-@CURRENT_EVEN
-D=M
-@CHECK_SECOND_IS_NEG
-D;JGE
-
-@TEMP_RESULT
-D=M
-@CHECK_OVERFLOW_NEG
-D;JGE
-@ADD_CURRENT_VALUE
-0;JMP
-
-(CHECK_SECOND_OPERAND)
-@ADD_CURRENT_VALUE
-0;JMP
-
-(CHECK_SECOND_IS_NEG)
-@ADD_CURRENT_VALUE
-0;JMP
-
-(CHECK_OVERFLOW_NEG)
-@OVERFLOW_OCCURRED
-0;JMP
-
-(ADD_CURRENT_VALUE)
-@TEMP_RESULT
-D=M
-@R1
-M=D
-
-@CURRENT_EVEN
-M=M+1
-@CURRENT_EVEN
-M=M+1
-
-@COUNTER
-M=M-1
-@CALC_LOOP
-0;JMP
-
-(CALC_DONE)
-@END
-0;JMP
-
-(CHECK_NEGATIVE)
-@R1
-M=-1            
-@END
-0;JMP
-
-(CHECK_ZERO)
-@R1
-M=0             
-@END
-0;JMP
-
-(OVERFLOW_OCCURRED)
-@R1
-M=-2           
+(OVERFLOW)
+    @R1
+    M=-2
+    @END
+    0;JMP
 
 (END)
-@END
-0;JMP
+    @END
+    0;JMP
